@@ -2,7 +2,7 @@ use std::io;
 
 fn main() {
     let riddle = "I am the beginning of the end, and the end of time and space. I am essential to creation, and I surround every place.";
-    let answer = "the letter e".to_string();
+    let answer = String::from("The letter e");
     let mut tries = 0;
 
     loop {

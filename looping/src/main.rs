@@ -13,7 +13,7 @@ fn main() {
         if user_input.trim() == answer {
             tries += 1;
             println!("Number of trials: {}", tries);
-            break;
+            std::process::exit(0)
         } else {
             tries += 1;
         }

@@ -2,7 +2,7 @@ use std::io;
 
 fn main() {
     let riddle = "I am the beginning of the end, and the end of time and space. I am essential to creation, and I surround every place.";
-    let answer = "the letter e";
+    let answer = "the letter e".to_string();
     let mut tries = 0;
 
     loop {
@@ -13,7 +13,7 @@ fn main() {
         if user_input.trim() == answer {
             tries += 1;
             println!("Number of trials: {}", tries);
-            std::process::exit(0)
+            break
         } else {
             tries += 1;
         }

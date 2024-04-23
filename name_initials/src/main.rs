@@ -7,7 +7,6 @@ pub fn initials(names: Vec<&str>) -> Vec<String> {
 
         for word in name.split_whitespace() {
             if !first_word {
-                initials.push('.');
                 initials.push(' ');
             } else {
                 first_word = false;
@@ -15,12 +14,17 @@ pub fn initials(names: Vec<&str>) -> Vec<String> {
 
             if let Some(first_char) = word.chars().nth(0) {
                 initials.push(first_char);
+                if !first_word{
+                    initials.push('.');
+                }
             }
         }
-
         result.push(initials);
     }
-
     result
 }
 
+fn main() {
+    let names = vec!["Harry Potter", "Someone Else", "J. L.", "Barack Obama"];
+    println!("{:?}", initials(names));
+}

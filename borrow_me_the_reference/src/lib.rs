@@ -33,9 +33,33 @@ pub fn delete_and_backspace(s: &mut String) {
 }
 
 pub fn do_operations(v: &mut Vec<String>) {
-    for equation in v.iter_mut() {
-        let result: i32 = equation.split(|c| c == '+' || c == '-').map(|part| part.parse::<i32>().unwrap()).sum();
-        *equation = result.to_string();
+    for operation in v {
+        let mut result = 0;
+        let mut num_str = String::new();
+        let mut last_op = '+';
+        for c in operation.chars() {
+            if c.is_digit(10) {
+                num_str.push(c);
+            } else {
+                let num = num_str.parse::<i32>().unwrap();
+                match last_op {
+                    '+' => result += num,
+                    '-' => result -= num,
+                     => {}
+                }
+                numstr.clear();
+                last_op = c;
+            }
+        }
+        if !num_str.is_empty() {
+            let num = num_str.parse::<i32>().unwrap();
+            match last_op {
+                '+' => result += num,
+                '-' => result -= num,
+                 => {}
+            }
+        }
+        *operation = result.to_string();
     }
 }
 

@@ -19,7 +19,7 @@ pub fn delete_and_backspace(s: &mut String) {
                         break;
                     }
                 }
-                for character in 0..=count {
+                for _char in 0..=count {
                     characters.next();
                 }
             }

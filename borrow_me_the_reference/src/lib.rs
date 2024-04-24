@@ -45,9 +45,10 @@ pub fn do_operations(v: &mut Vec<String>) {
                 match last_op {
                     '+' => result += num,
                     '-' => result -= num,
-                     => {}
+                    _ => {}
+                     
                 }
-                numstr.clear();
+                num_str.clear();
                 last_op = c;
             }
         }
@@ -56,10 +57,9 @@ pub fn do_operations(v: &mut Vec<String>) {
             match last_op {
                 '+' => result += num,
                 '-' => result -= num,
-                 => {}
+                _ => {}
             }
         }
         *operation = result.to_string();
     }
 }
-

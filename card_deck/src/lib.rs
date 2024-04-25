@@ -1,4 +1,4 @@
-use rand::Rng;
+use std::fmt;
 
 #[derive(Debug)]
 pub enum Suit {
@@ -7,6 +7,7 @@ pub enum Suit {
     Spade,
     Club,
 }
+
 #[derive(Debug)]
 pub enum Rank {
     Ace,
@@ -17,13 +18,15 @@ pub enum Rank {
 }
 
 impl Suit {
+    fn get_random() -> u8 {
+        let time = std::time::SystemTime::now();
+        let since_epoch = time.duration_since(std::time::UNIX_EPOCH).unwrap();
+        since_epoch.as_secs() as u8
+    }
+
     pub fn random() -> Suit {
-        match rand::thread_rng().gen_range(1..=4) {
-            1 => Suit::Heart,
-            2 => Suit::Diamond,
-            3 => Suit::Spade,
-            _ => Suit::Club,
-        }
+        let random_value = (Self::get_random() % 4) + 1;
+        Suit::translate(random_value)
     }
 
     pub fn translate(value: u8) -> Suit {
@@ -31,39 +34,41 @@ impl Suit {
             1 => Suit::Heart,
             2 => Suit::Diamond,
             3 => Suit::Spade,
-            _ => Suit::Club,
+            4 => Suit::Club,
+            _ => panic!("Invalid suit value"),
         }
     }
 }
 
 impl Rank {
     pub fn random() -> Rank {
-        match rand::thread_rng().gen_range(1..=13) {
-            1 => Rank::Ace,
-            11 => Rank::Jack,
-            12 => Rank::Queen,
-            13 => Rank::King,
-            n => Rank::Number(n as u8),
-        }
+        let random_value = (Suit::get_random() % 13) + 1;
+        Rank::translate(random_value)
     }
 
     pub fn translate(value: u8) -> Rank {
         match value {
             1 => Rank::Ace,
+            n @ 2..=10 => Rank::Number(n),
             11 => Rank::Jack,
             12 => Rank::Queen,
             13 => Rank::King,
-            n => Rank::Number(n),
+            _ => panic!("Invalid rank value"),
         }
     }
 }
-#[derive(Debug)]
+
 pub struct Card {
     pub suit: Suit,
     pub rank: Rank,
 }
 
-pub fn winner_card(card: &Card) -> bool {
-    matches!(&card.rank, Rank::Ace) && matches!(&card.suit, Suit::Spade)
+impl fmt::Debug for Card {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Card {{ suit: {:?}, rank: {:?} }}", self.suit, self.rank)
+    }
 }
 
+pub fn winner_card(card: &Card) -> bool {
+    matches!(card, Card { suit: Suit::Spade, rank: Rank::Ace })
+}

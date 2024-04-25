@@ -1,4 +1,6 @@
-#[derive(Debug)]
+use rand::Rng;
+
+#[derive(Debug, PartialEq)]
 pub enum Suit {
     Heart,
     Diamond,
@@ -6,28 +8,24 @@ pub enum Suit {
     Club,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Rank {
     Ace,
-    Number(u8),
-    Jack,
-    Queen,
     King,
+    Queen,
+    Jack,
+    Number(u8),
 }
 
 impl Suit {
     pub fn random() -> Suit {
-        match std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
-            Ok(duration) => {
-                let seconds = duration.as_secs();
-                match seconds % 4 {
-                    0 => Suit::Heart,
-                    1 => Suit::Diamond,
-                    2 => Suit::Spade,
-                    _ => Suit::Club,
-                }
-            }
-            Err(_) => Suit::Heart, // Fallback if system time retrieval fails
+        let mut rng = rand::threadrng();
+        let index: u8 = rng.gen_range(0, 4);
+        match index {
+            1 => Suit::Heart,
+            2 => Suit::Diamond,
+            3 => Suit::Spade,
+             => Suit::Club,
         }
     }
 
@@ -36,47 +34,44 @@ impl Suit {
             1 => Suit::Heart,
             2 => Suit::Diamond,
             3 => Suit::Spade,
-            _ => Suit::Club,
+             => Suit::Club,
         }
     }
 }
 
 impl Rank {
     pub fn random() -> Rank {
-        match std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
-            Ok(duration) => {
-                let seconds = duration.as_secs();
-                match seconds % 13 {
-                    0 => Rank::Ace,
-                    10 => Rank::Jack,
-                    11 => Rank::Queen,
-                    12 => Rank::King,
-                    n => Rank::Number(n as u8 + 1),
-                }
-            }
-            Err(_) => Rank::Number(1), // Fallback if system time retrieval fails
+        let mut rng = rand::thread_rng();
+        let index = rng.gen_range(1, 13);
+        match index {
+            1 => Rank::Ace,
+            (2..=10) => Rank::Number(index),
+            11 => Rank::King,
+            12 => Rank::Queen,
+             => Rank::Jack,
         }
     }
 
     pub fn translate(value: u8) -> Rank {
         match value {
             1 => Rank::Ace,
-            11 => Rank::Jack,
+            (2..=10) => Rank::Number(value),
+            11 => Rank::King,
             12 => Rank::Queen,
-            13 => Rank::King,
-            n => Rank::Number(n),
+            _ => Rank::Jack,
         }
     }
 }
-#[derive(Debug)]
+
+#[derive(Debug, PartialEq)]
 pub struct Card {
     pub suit: Suit,
     pub rank: Rank,
 }
 
 pub fn winner_card(card: &Card) -> bool {
-    match (&card.suit, &card.rank) {
-        (Suit::Spade, Rank::Ace) => true,
-        _ => false,
+    if card.suit == Suit::Spade && card.rank == Rank::Ace {
+        return true;
     }
+    false
 }

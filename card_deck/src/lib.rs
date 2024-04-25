@@ -1,5 +1,3 @@
-use std::fmt;
-
 #[derive(Debug)]
 pub enum Suit {
     Heart,
@@ -18,15 +16,19 @@ pub enum Rank {
 }
 
 impl Suit {
-    fn get_random() -> u8 {
-        let time = std::time::SystemTime::now();
-        let since_epoch = time.duration_since(std::time::UNIX_EPOCH).unwrap();
-        since_epoch.as_secs() as u8
-    }
-
     pub fn random() -> Suit {
-        let random_value = (Self::get_random() % 4) + 1;
-        Suit::translate(random_value)
+        match std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
+            Ok(duration) => {
+                let seconds = duration.as_secs();
+                match seconds % 4 {
+                    0 => Suit::Heart,
+                    1 => Suit::Diamond,
+                    2 => Suit::Spade,
+                    _ => Suit::Club,
+                }
+            }
+            Err(_) => Suit::Heart, // Fallback if system time retrieval fails
+        }
     }
 
     pub fn translate(value: u8) -> Suit {
@@ -34,41 +36,47 @@ impl Suit {
             1 => Suit::Heart,
             2 => Suit::Diamond,
             3 => Suit::Spade,
-            4 => Suit::Club,
-            _ => panic!("Invalid suit value"),
+            _ => Suit::Club,
         }
     }
 }
 
 impl Rank {
     pub fn random() -> Rank {
-        let random_value = (Suit::get_random() % 13) + 1;
-        Rank::translate(random_value)
+        match std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH) {
+            Ok(duration) => {
+                let seconds = duration.as_secs();
+                match seconds % 13 {
+                    0 => Rank::Ace,
+                    10 => Rank::Jack,
+                    11 => Rank::Queen,
+                    12 => Rank::King,
+                    n => Rank::Number(n as u8 + 1),
+                }
+            }
+            Err(_) => Rank::Number(1), // Fallback if system time retrieval fails
+        }
     }
 
     pub fn translate(value: u8) -> Rank {
         match value {
             1 => Rank::Ace,
-            n @ 2..=10 => Rank::Number(n),
             11 => Rank::Jack,
             12 => Rank::Queen,
             13 => Rank::King,
-            _ => panic!("Invalid rank value"),
+            n => Rank::Number(n),
         }
     }
 }
-
+#[derive(Debug)]
 pub struct Card {
     pub suit: Suit,
     pub rank: Rank,
 }
 
-impl fmt::Debug for Card {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "Card {{ suit: {:?}, rank: {:?} }}", self.suit, self.rank)
-    }
-}
-
 pub fn winner_card(card: &Card) -> bool {
-    matches!(card, Card { suit: Suit::Spade, rank: Rank::Ace })
+    match (&card.suit, &card.rank) {
+        (Suit::Spade, Rank::Ace) => true,
+        _ => false,
+    }
 }

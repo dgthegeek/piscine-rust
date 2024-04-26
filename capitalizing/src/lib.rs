@@ -1,43 +1,45 @@
 pub fn capitalize_first(input: &str) -> String {
-    if let Some(first_char) = input.chars().next() {
-        let capitalized = first_char.to_uppercase();
-        let mut result = capitalized.to_string();
-        result.push_str(&input[1..]);
-        result
-    } else {
-        input.to_string() // Return input unchanged if it's an empty string
+    let mut result = String::new();
+    if let Some(first_char) = input.chars().nth(0){
+        result.push(first_char.to_ascii_uppercase())
     }
+    result+= &input[1..];
+    result
 }
 
 pub fn title_case(input: &str) -> String {
-    input
-        .split_whitespace()
-        .map(|word| {
-            let mut chars = word.chars();
-            match chars.next() {
-                None => String::new(),
-                Some(first_char) => {
-                    let mut capitalized = first_char.to_uppercase();
-                    capitalized.extend(chars);
-                    capitalized
-                }
+    let mut result = String::new();
+
+    for word in input.split_whitespace(){
+        result+= &capitalize_first(word);
+        if let Some(last_word) = input.split_whitespace().last(){
+            if word != last_word{
+                result.push(' ');
             }
-        })
-        .collect::<Vec<String>>()
-        .join(" ")
+        }
+    }
+    result
+    
 }
 
 pub fn change_case(input: &str) -> String {
-    input
-        .chars()
-        .map(|c| {
-            if c.is_ascii_lowercase() {
-                c.to_ascii_uppercase()
-            } else if c.is_ascii_uppercase() {
-                c.to_ascii_lowercase()
-            } else {
-                c
-            }
-        })
-        .collect()
+    let mut result = String::new();
+    for c in input.chars(){
+        if c.is_ascii_lowercase(){
+           let up=  c.to_uppercase().to_string();  
+            result+= &up;
+        } else if c.is_ascii_uppercase() {
+            let low=  c.to_lowercase().to_string();  
+            result+= &low;
+        }else{
+            result.push(' ');
+        }
+    };
+    result
+}
+
+fn main() {
+    println!("{}", capitalize_first("joe is missing"));
+    println!("{}", title_case("jill is leaving A"));
+    println!("{}",change_case("heLLo THere"));
 }

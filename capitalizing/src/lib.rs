@@ -2,6 +2,8 @@ pub fn capitalize_first(input: &str) -> String {
     let mut result = String::new();
     if let Some(first_char) = input.chars().nth(0){
         result.push(first_char.to_ascii_uppercase())
+    }else{
+        return input.to_string()
     }
     result+= &input[1..];
     result

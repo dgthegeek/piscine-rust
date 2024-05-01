@@ -64,18 +64,3 @@ pub fn rem(a: &str, b: &str) -> Result<String, Box<dyn Error>> {
     let b: f32 = b.parse().map_err(|e| Box::new(e) as Box<dyn Error>)?;
     Ok((a % b).to_string())
 }
-
-fn main() {
-    let mut handler = FlagsHandler { flags: HashMap::new() };
-
-    let d = Flag::opt_flag("d", "divides the values, formula (a / b)");
-    let r = Flag::opt_flag("r", "remainder of the division between two values, formula (a % b)");
-
-    handler.add_flag((d.short_hand.clone(), d.long_hand.clone()), div);
-    handler.add_flag((r.short_hand.clone(), r.long_hand.clone()), rem);
-
-    println!("{:?}", handler.exec_func(("-d".to_string(), "--d".to_string()), &["1.0", "2.0"]));
-    println!("{:?}", handler.exec_func(("-r".to_string(), "--r".to_string()), &["2.0", "2.0"]));
-    println!("{:?}", handler.exec_func(("-d".to_string(), "--d".to_string()), &["a", "2.0"]));
-    println!("{:?}", handler.exec_func(("-r".to_string(), "--r".to_string()), &["2.0", "fd"]));
-}

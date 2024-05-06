@@ -3,14 +3,19 @@
 version = 3
 
 [[package]]
-name = "json"
-version = "0.12.4"
+name = "case"
+version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "078e285eafdfb6c4b434e0d31e8cfcb5115b651496faca5749b88fafd4f23bfd"
+checksum = "fd6c0e7b807d60291f42f33f58480c0bfafe28ed08286446f45e463728cf9c1c"
 
 [[package]]
-name = "macro_calculator"
+name = "edit_distance"
+version = "0.1.0"
+
+[[package]]
+name = "expected_variable"
 version = "0.1.0"
 dependencies = [
- "json",
+ "case",
+ "edit_distance",
 ]

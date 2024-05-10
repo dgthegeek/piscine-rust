@@ -1,4 +1,5 @@
-use std::fmt::Formatter;
+use std::fmt;
+
 #[derive(Debug)]
 pub struct Player {
 	pub name: String,
@@ -23,24 +24,30 @@ impl Player {
 	}
 }
 
-impl std::fmt::Display for Player {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "{}\nStrength: {}, Score: {}, Money: {}\nWeapons: {:?}", 
-        self.name, self.strength, self.score, self.money, self.weapons)
-    }
-}
 pub trait Food {
 	fn gives(&self) -> f64;
 }
 
 impl Food for Fruit {
-	fn gives(&self) -> f64 {
-		self.weight_in_kg * 4.0
-	}
+    fn gives(&self) -> f64 {
+        self.weight_in_kg * 4.0
+    }
 }
 
 impl Food for Meat {
-	fn gives(&self) -> f64 {
-		self.weight_in_kg * (1.0 - self.fat_content) * 4.0 + self.fat_content * self.weight_in_kg * 9.0
-	}
+    fn gives(&self) -> f64 {
+        let protein_content = self.weight_in_kg * (1.0 - self.fat_content);
+        let fat_strength = self.weight_in_kg * 9.0 * self.fat_content;
+        let protein_strength = protein_content * 4.0;
+        fat_strength + protein_strength
+    }
+}
+
+impl fmt::Display for Player{
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f,
+            "{}\nStrength: {}, Score: {}, Money: {}\nWeapons: {:?}",
+            self.name, self.strength, self.score , self.money, self.weapons
+        )
+    }
 }

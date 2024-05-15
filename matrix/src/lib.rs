@@ -1,43 +1,50 @@
-extern crate lalgebra_scalar;
-pub use lalgebra_scalar::Scalar;
-mod ops;
-mod mult;
+pub mod mult;
+use lalgebra_scalar::Scalar;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Matrix<T>(pub Vec<Vec<T>>);
 
-impl<T: Scalar<Item = T>> Matrix<T> {
+impl<T: Scalar + Clone> Matrix<T> {
     pub fn new() -> Matrix<T> {
-        Matrix(vec![vec![T::zero()]])
+        Matrix(vec![vec![T::zero(); 1]])
     }
 
     pub fn zero(row: usize, col: usize) -> Matrix<T> {
-        let mut row_values: Vec<Vec<T>> = vec![];
-
-        for _r in 0..row {
-            let mut col_values: Vec<T> = vec![];
-            for _c in 0..col {
-                col_values.push(T::zero());
-            }
-            row_values.push(col_values);
-        }
-        Matrix(row_values)
+        Matrix(vec![vec![T::zero(); col]; row])
     }
 
     pub fn identity(n: usize) -> Matrix<T> {
-        let mut row_values: Vec<Vec<T>> = vec![];
-
-        for r in 0..n {
-            let mut col_values: Vec<T> = vec![];
-            for c in 0..n {
-                if c == r {
-                    col_values.push(T::one());
-                } else {
-                    col_values.push(T::zero());
-                }
-            }
-            row_values.push(col_values);
+        let mut matrix = Matrix::zero(n, n);
+        for i in 0..n {
+            matrix.0[i][i] = T::one();
         }
-        Matrix(row_values)
+        matrix
+    }
+
+    pub fn number_of_cols(&self) -> usize {
+        if self.0.is_empty() {
+            0
+        } else {
+            self.0[0].len()
+        }
+    }
+
+    pub fn number_of_rows(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn row(&self, n: usize) -> Vec<T> {
+        if n < self.number_of_rows() {
+            self.0[n].clone()
+        } else {
+            Vec::new()
+        }
+    }
+
+    pub fn col(&self, n: usize) -> Vec<T> {
+        if self.number_of_cols() == 0 {
+            return Vec::new();
+        }
+        self.0.iter().map(|row| row[n].clone()).collect()
     }
 }

@@ -1,64 +1,43 @@
-use crate::{Matrix, Scalar};
-use std::ops::{ Add, Sub };
-
-impl <T: Scalar<Item = T>> Matrix<T> {
-    pub fn dim(&self) -> (usize, usize) {
-        let rows = self.0.len();
-        let columns = if rows > 0 { self.0[0].len() } else { 0 };
-        (rows, columns)
-    }
-
-    pub fn is_same_dim(&self, other: &Matrix<T>) -> bool {
-        self.dim().0 == other.dim().0 && self.dim().1 == other.dim().1
-    }
-}
-
-impl <T: Scalar<Item = T> + Add<Output = T> + Clone> Add for Matrix<T> {
-    type Output = Option<Matrix<T>> ;
-
-    fn add(self, other: Self) -> Self::Output {
-        if !self.is_same_dim(&other) {
-            return None;
-        };
-
-        let new_data = self
-            .0
-            .iter()
-            .zip(other.0.iter())
-            .map(|(row_a, row_b)| {
-                row_a
-                    .iter()
-                    .zip(row_b.iter())
-                    .map(|(&x, &y)| x.clone() + y.clone())
-                    .collect()
-            })
-            .collect();
-
-        Some(Matrix(new_data))
-    }
-}
-
-impl <T: Scalar<Item = T>> Sub for Matrix<T> {
+use std::ops::{Add, Sub};
+#[derive(Debug, PartialEq)]
+pub struct Matrix<T>(pub Vec<Vec<T>>);
+impl<T> Add for Matrix<T>
+where
+    T: Copy + Add<Output = T>,
+{
     type Output = Option<Matrix<T>>;
-
-    fn sub(self, other: Self) -> Self::Output {
-        if !self.is_same_dim(&other) {
+    fn add(self, other: Matrix<T>) -> Option<Matrix<T>> {
+        if self.0.len() != other.0.len() || self.0[0].len() != other.0[0].len() {
             return None;
-        };
-
-        let new_data = self
-            .0
-            .iter()
-            .zip(other.0.iter())
-            .map(|(row_a, row_b)| {
-                row_a
-                    .iter()
-                    .zip(row_b.iter())
-                    .map(|(&x, &y)| x.clone() - y.clone())
-                    .collect()
-            })
-            .collect();
-
-        Some(Matrix(new_data))
+        }
+        let mut result = vec![];
+        for i in 0..self.0.len() {
+            let mut row = vec![];
+            for j in 0..self.0[i].len() {
+                row.push(self.0[i][j] + other.0[i][j]);
+            }
+            result.push(row);
+        }
+        Some(Matrix(result))
+    }
+}
+impl<T> Sub for Matrix<T>
+where
+    T: Copy + Sub<Output = T>,
+{
+    type Output = Option<Matrix<T>>;
+    fn sub(self, other: Matrix<T>) -> Option<Matrix<T>> {
+        if self.0.len() != other.0.len() || self.0[0].len() != other.0[0].len() {
+            return None;
+        }
+        let mut result = vec![];
+        for i in 0..self.0.len() {
+            let mut row = vec![];
+            for j in 0..self.0[i].len() {
+                row.push(self.0[i][j] - other.0[i][j]);
+            }
+            result.push(row);
+        }
+        Some(Matrix(result))
     }
 }

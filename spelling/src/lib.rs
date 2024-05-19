@@ -1,56 +1,66 @@
 pub fn spell(n: u64) -> String {
-    match n {
-        0 => "zero".to_string(),
-        1..=19 => small_numbers(n),
-        20..=99 => tens(n),
-        100..=999 => hundreds(n),
-        1000..=999999 => thousands(n),
-        1000000 => "one million".to_string(),
-        _ => unimplemented!("The function is not designed to handle numbers beyond one million."),
+    if n == 0 {
+        return String::from("zero");
     }
-}
 
-fn small_numbers(n: u64) -> String {
-    let words = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
-                 "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
-                 "seventeen", "eighteen", "nineteen"];
-    words[(n - 1) as usize].to_string()
-}
+    let mut result = String::new();
+    let ones = [
+        "", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+    ];
+    let teens = [
+        "",
+        "eleven",
+        "twelve",
+        "thirteen",
+        "fourteen",
+        "fifteen",
+        "sixteen",
+        "seventeen",
+        "eighteen",
+        "nineteen",
+    ];
+    let tens = [
+        "", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety",
+    ];
 
-fn tens(n: u64) -> String {
-    let tens = ["twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
-    if n < 20 {
-        return small_numbers(n);
-    }
-    let prefix = tens[(n / 10 - 2) as usize];
-    let remainder = n % 10;
-    if remainder == 0 {
-        prefix.to_string()
+    if n >= 1_000_000 {
+        result.push_str(&spell(n / 1_000_000));
+        result.push_str(" million");
+        if n % 1_000_000 != 0 {
+            result.push(' ');
+            result.push_str(&spell(n % 1_000_000));
+        }
+    } else if n >= 1_000 {
+        result.push_str(&spell(n / 1_000));
+        result.push_str(" thousand");
+        if n % 1_000 != 0 {
+            result.push(' ');
+            result.push_str(&spell(n % 1_000));
+        }
+    } else if n >= 100 {
+        result.push_str(ones[(n / 100) as usize]);
+        result.push_str(" hundred");
+        if n % 100 != 0 {
+            result.push(' ');
+            result.push_str(&spell(n % 100));
+        }
+    } else if n >= 20 {
+        result.push_str(tens[(n / 10) as usize]);
+        if n % 10 != 0 {
+            result.push('-');
+            result.push_str(ones[(n % 10) as usize]);
+        }
     } else {
-        format!("{}-{}", prefix, small_numbers(remainder))
+        if n == 10 {
+            result.push_str("ten");
+        } else if n == 0 {
+            result.push_str("zero");
+        } else if n <= 9 {
+            result.push_str(ones[n as usize]);
+        } else {
+            result.push_str(teens[(n - 10) as usize]);
+        }
     }
-}
-
-fn hundreds(n: u64) -> String {
-    let hundreds = n / 100;
-    let remainder = n % 100;
-    let prefix = format!("{} hundred", small_numbers(hundreds));
-    if remainder == 0 {
-        prefix
-    } else {
-        format!("{} {}", prefix, if remainder < 20 { small_numbers(remainder) } else { tens(remainder) })
-    }
-}
-
-fn thousands(n: u64) -> String {
-    let thousands = n / 1000;
-    let remainder = n % 1000;
-    let prefix = format!("{} thousand", spell(thousands));
-    if remainder == 0 {
-        prefix
-    } else if remainder < 100 {
-        format!("{} {}", prefix, spell(remainder))
-    } else {
-        format!("{} {}", prefix, hundreds(remainder))
-    }
+    
+    result
 }

@@ -1,82 +1,45 @@
-pub use lalgebra_scalar;
-use core::ops::{ Add, Mul };
-use std::fmt;
-
-pub trait Scalar: Sized + Copy + Add<Self, Output = Self> + Mul<Self, Output = Self> {
-    // Définissez ici les fonctions spécifiques à Scalar, telles que zero() et one()
-    fn zero() -> Self;
-    fn one() -> Self;
-}
-impl Scalar for i64 {
-    fn zero() -> Self {
-        0
-    }
-
-    fn one() -> Self {
-        1
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
+use std::ops::{Add, Mul};
+use std::fmt::Debug;
+use std::cmp::PartialEq;
+use std::iter::Sum;
+pub trait Scalar: Copy + Add<Output = Self> + Mul<Output = Self> + Debug + PartialEq + Sum {}
+impl<T: Copy + Add<Output = Self> + Mul<Output = Self> + Debug + PartialEq + Sum> Scalar for T {}
 pub struct Vector<T: Scalar>(pub Vec<T>);
-
-impl<T: Scalar> Add for Vector<T> {
-    type Output = Option<Self>;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        if self.0.len() != rhs.0.len() {
-            return None;
-        }
-
-        let mut result = self.clone();
-        for (i, value) in rhs.0.into_iter().enumerate() {
-            result.0[i] = result.0[i] + value;
-        }
-        Some(result)
-    }
-}
-
 impl<T: Scalar> Vector<T> {
     pub fn new() -> Self {
         Vector(Vec::new())
     }
-
     pub fn dot(&self, other: &Self) -> Option<T> {
         if self.0.len() != other.0.len() {
             return None;
         }
-
-        let mut result = T::zero();
-        for (a, b) in self.0.iter().zip(other.0.iter()) {
-            result = result + (*a * *b);
-        }
-        Some(result)
+        Some(self.0.iter().zip(&other.0).map(|(a, b)| *a * *b).sum())
     }
 }
-
-// Implement the Mul trait for Vector to allow scalar multiplication
-impl<T: Scalar> Mul<T> for Vector<T> {
-    type Output = Self;
-
-    fn mul(self, scalar: T) -> Self {
-        let mut result = self.clone();
-        for value in result.0.iter_mut() {
-            *value = *value * scalar;
+impl<T: Scalar> Add for Vector<T> {
+    type Output = Option<Self>;
+    fn add(self, other: Self) -> Self::Output {
+        if self.0.len() != other.0.len() {
+            return None;
         }
-        result
+        Some(Vector(
+            self.0.iter().zip(&other.0).map(|(a, b)|*a + *b).collect(),
+        ))
     }
 }
-
-// Implement the Display trait for Vector to allow printing
-impl<T: fmt::Display + Scalar> fmt::Display for Vector<T> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Vector([")?;
-        for (i, val) in self.0.iter().enumerate() {
-            if i != 0 {
-                write!(f, ", ")?;
-            }
-            write!(f, "{}", val)?;
-        }
-        write!(f, "])")
+impl<T: Scalar> Clone for Vector<T> {
+    fn clone(&self) -> Self {
+        Vector(self.0.clone())
+    }
+}
+impl<T: Scalar> PartialEq for Vector<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.0 == other.0
+    }
+}
+impl<T: Scalar> Eq for Vector<T> {}
+impl<T: Scalar> Debug for Vector<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.0)
     }
 }

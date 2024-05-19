@@ -24,7 +24,6 @@ impl Vehicle for Truck<'_> {
     fn model(&self) -> &str {
         self.model
     }
-
     fn year(&self) -> u32 {
         self.year
     }
@@ -34,7 +33,6 @@ impl Vehicle for Car<'_> {
     fn model(&self) -> &str {
         self.model
     }
-
     fn year(&self) -> u32 {
         self.year
     }
@@ -43,4 +41,3 @@ impl Vehicle for Car<'_> {
 pub fn all_models(list: Vec<&dyn Vehicle>) -> Vec<&str> {
     list.iter().map(|v| v.model()).collect()
 }
-

@@ -40,7 +40,7 @@ impl<T: Scalar + Clone> Matrix<T> {
             Vec::new()
         }
     }
-
+    
     pub fn col(&self, n: usize) -> Vec<T> {
         if self.number_of_cols() == 0 {
             return Vec::new();

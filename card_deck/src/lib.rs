@@ -1,6 +1,6 @@
 use rand::Rng;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Suit {
     Heart,
     Diamond,
@@ -8,7 +8,7 @@ pub enum Suit {
     Club,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum Rank {
     Ace,
     King,
@@ -19,12 +19,12 @@ pub enum Rank {
 
 impl Suit {
     pub fn random() -> Suit {
-        let mut rng = rand::thread_rng();
-        let index: u8 = rng.gen_range(0, 4);
-        match index {
-            1 => Suit::Heart,
-            2 => Suit::Diamond,
-            3 => Suit::Spade,
+        let mut rng = rand::thread_rng(); // Get a random number generator
+        let num = rng.gen_range(0, 4);
+        match num {
+            0 => Suit::Heart,
+            1 => Suit::Diamond,
+            2 => Suit::Spade,
             _ => Suit::Club,
         }
     }
@@ -42,36 +42,36 @@ impl Suit {
 impl Rank {
     pub fn random() -> Rank {
         let mut rng = rand::thread_rng();
-        let index = rng.gen_range(1, 13);
-        match index {
-            1 => Rank::Ace,
-            (2..=10) => Rank::Number(index),
-            11 => Rank::King,
-            12 => Rank::Queen,
-            _ => Rank::Jack,
+        let num = rng.gen_range(0, 5);
+        match num {
+            0 => Rank::Ace,
+            1 => Rank::King,
+            2 => Rank::Queen,
+            3 => Rank::Jack,
+            _ => Rank::Number(rng.gen_range(2, 11)),
         }
     }
 
     pub fn translate(value: u8) -> Rank {
         match value {
             1 => Rank::Ace,
-            (2..=10) => Rank::Number(value),
-            11 => Rank::King,
+            11 => Rank::Jack,
             12 => Rank::Queen,
-            _ => Rank::Jack,
+            13 => Rank::King,
+            _ => Rank::Number(value),
         }
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Card {
     pub suit: Suit,
     pub rank: Rank,
 }
 
 pub fn winner_card(card: &Card) -> bool {
-    if card.suit == Suit::Spade && card.rank == Rank::Ace {
-        return true;
-    }
-    false
+    matches!(card, Card {
+        suit: Suit::Spade,
+        rank: Rank::Ace,
+    })
 }

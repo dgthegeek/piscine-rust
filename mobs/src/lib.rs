@@ -14,7 +14,6 @@ impl Mob {
     pub fn attack(&mut self, defense: &mut Mob) {
         let mut power_attack = 0;
         let mut power_defense = 0;
-
         for member in self.members.iter() {
             match member.role {
                 member::Role::Underboss => power_attack += 4,

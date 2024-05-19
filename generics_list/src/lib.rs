@@ -1,7 +1,6 @@
 #[derive(Clone, Debug)]
 pub struct List<T> {
     pub head: Option<Node<T>>,
-    pub len :usize,
 }
 
 #[derive(Clone, Debug)]
@@ -12,42 +11,29 @@ pub struct Node<T> {
 
 impl<T> List<T> {
     pub fn new() -> List<T> {
-        List { head: None,len: 0 }
+        List { head: None }
     }
 
     pub fn push(&mut self, value: T) {
-        self.len += 1;
-        let new_node = Node {
+        let node = Node {
             value,
-            next: self.head.take().map(Box::new),
+            next: self.head.take().map(Box::new)
         };
-        self.head = Some(new_node);
+        self.head = Some(node);
     }
 
-    pub fn pop(&mut self) -> Option<T> {
-        self.head.take().map(|node| {
-            self.head = node.next.map(|x| *x);
-            self.len-=1;
-            node.value
-        })
+    pub fn pop(&mut self) {
+        self.head = self.head.take().and_then(|node| node.next.map(|boxed| *boxed));
     }
 
     pub fn len(&self) -> usize {
-        self.len
+        let mut length = 0;
+        let mut current_node = self.head.as_ref();
+        while let Some(node) = current_node {
+            length += 1;
+            current_node = node.next.as_ref().map(|boxed| &**boxed);
+        }
+
+        length
     }
-}
-
-fn main() {
-    let mut new_list_str = List::new();
-    new_list_str.push("String Test 1");
-    println!("The size of the list is {}", new_list_str.len());
-
-    new_list_str.push("String Test 2");
-    println!("The size of the list is {}", new_list_str.len());
-
-    new_list_str.push("String Test 3");
-    println!("The size of the list is {}", new_list_str.len());
-
-    new_list_str.pop();
-    println!("The size of the list is {}", new_list_str.len());
 }

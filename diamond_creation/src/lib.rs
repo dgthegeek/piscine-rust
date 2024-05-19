@@ -1,21 +1,35 @@
-pub fn get_diamond(letter: char) -> Vec<String> {
-    if !('A'..='Z').contains(&letter) {
-        return vec![String::from("Input must be a capital letter from A to Z.")];
+pub fn get_diamond(c: char) -> Vec<String> {
+    let size = (c as u8 - b'A' + 1) as usize;
+    let mut diamond = Vec::new();
+    let mut row = 1;
+
+    for ch in b'A'..=c as u8 {
+        let spaces = size - (ch - b'A') as usize - 1;
+        let mut line = String::new();
+        line.push_str(&" ".repeat(spaces));
+        line.push(ch as char);
+        if ch != b'A' {
+            line.push_str(&" ".repeat(row));
+            line.push(ch as char);
+            row += 2;
+        }
+        line.push_str(&" ".repeat(spaces));
+        diamond.push(line);
     }
 
-    let size = letter as u8 - b'A' + 1;
-    let mut diamond = Vec::new();
-
-    (0..size).chain((0..size - 1).rev()).for_each(|i| {
-        let mut row = " ".repeat((size - i - 1) as usize);
-        row.push((b'A' + i) as char);
-        if i > 0 {
-            row.push_str(&" ".repeat((2 * i - 1) as usize));
-            row.push((b'A' + i) as char);
+    for ch in (b'A'..c as u8).rev() {
+        let spaces = size - (ch - b'A') as usize - 1;
+        let mut line = String::new();
+        line.push_str(&" ".repeat(spaces));
+        line.push(ch as char);
+        if ch != b'A' {
+            line.push_str(&" ".repeat(row - 4));
+            line.push(ch as char);
+            row -= 2;
         }
-        row.push_str(&" ".repeat((size - i - 1) as usize));
-        diamond.push(row);
-    });
-
+        line.push_str(&" ".repeat(spaces));
+        diamond.push(line);
+    }
+    
     diamond
 }

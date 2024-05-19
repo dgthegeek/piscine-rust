@@ -1,7 +1,7 @@
-
 pub fn delete_and_backspace(s: &mut String) {
     let mut result = Vec::new();
     let mut characters = s.chars().peekable();
+
     while let Some(&character) = characters.peek() {
         match character {
             '-' => {
@@ -19,7 +19,7 @@ pub fn delete_and_backspace(s: &mut String) {
                         break;
                     }
                 }
-                for _char in 0..=count {
+                for _ in 0..=count {
                     characters.next();
                 }
             }
@@ -29,6 +29,7 @@ pub fn delete_and_backspace(s: &mut String) {
             }
         }
     }
+
     *s = result.into_iter().collect();
 }
 
@@ -37,6 +38,7 @@ pub fn do_operations(v: &mut Vec<String>) {
         let mut result = 0;
         let mut num_str = String::new();
         let mut last_op = '+';
+
         for c in operation.chars() {
             if c.is_digit(10) {
                 num_str.push(c);
@@ -46,12 +48,12 @@ pub fn do_operations(v: &mut Vec<String>) {
                     '+' => result += num,
                     '-' => result -= num,
                     _ => {}
-                     
                 }
                 num_str.clear();
                 last_op = c;
             }
         }
+
         if !num_str.is_empty() {
             let num = num_str.parse::<i32>().unwrap();
             match last_op {
@@ -60,6 +62,7 @@ pub fn do_operations(v: &mut Vec<String>) {
                 _ => {}
             }
         }
+
         *operation = result.to_string();
     }
 }

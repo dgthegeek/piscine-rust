@@ -6,9 +6,9 @@ pub fn id(student: &Student) -> u32 {
 }
 
 pub fn first_name(student: &Student) -> String {
-    student.1.clone()
+    student.1.to_string()
 }
 
 pub fn last_name(student: &Student) -> String {
-    student.2.clone()
+    student.2.to_string()
 }

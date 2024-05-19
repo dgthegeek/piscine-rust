@@ -1,9 +1,8 @@
-mod err;
-use err::{ParseErr, ReadErr};
-pub use json::{parse, stringify, JsonValue};
 pub use std::error::Error;
-use std::fs::File;
-use std::io::Read;
+use std::fs::read_to_string;
+mod err;
+use err::*;
+use json::JsonValue;
 
 #[derive(Debug, Eq, PartialEq)]
 pub struct Task {
@@ -19,54 +18,55 @@ pub struct TodoList {
 }
 
 impl TodoList {
-    pub fn get_todo(path: &str) -> Result<TodoList, Box<dyn Error>> {
-        // Ouvre le fichier et gère les erreurs potentielles de l'ouverture
-        let mut file = File::open(path).map_err(|e| {
-            Box::new(ReadErr {
-                child_err: Box::new(e),
-            })
-        })?;
-
-        // Lit le contenu du fichier dans une chaîne de caractères
-        let mut contents = String::new();
-        
-        file.read_to_string(&mut contents).map_err(|e| {
-            Box::new(ReadErr {
-                child_err: Box::new(e),
-            })
-        })?;
-
-        // Parse le contenu JSON
-        let parsed =
-            parse(&contents).map_err(|e| Box::new(ParseErr::Malformed(Box::new(e))))?;
-
-        // Convertit le JSON en TodoList
-        let todo_list = parse_json_to_todo_list(parsed)?;
-
-        Ok(todo_list)
+    fn parse(j: JsonValue) -> Option<TodoList> {
+        let mut tasks: Vec<Task> = Vec::new();
+        match j {
+            JsonValue::Object(o) => {
+                let title = o.get("title")?.as_str()?;
+                if let Some(JsonValue::Array(ts)) = o.get("tasks") {
+                    for t in ts {
+                        if let JsonValue::Object(o) = t {
+                            tasks.push(Task {
+                                id: o.get("id")?.as_u32()?,
+                                description: o.get("description")?.as_str()?.to_string(),
+                                level: o.get("level")?.as_u32()?,
+                            });
+                        }
+                    }
+                    return Some(TodoList {
+                        title: title.to_string(),
+                        tasks,
+                    });
+                }
+            }
+            _ => (),
+        }
+        return None;
+    }
+    
+    pub fn get_todo(source: &str) -> Result<TodoList, Box<dyn Error>> {
+        let json = match read_to_string(source) {
+            Err(e) => {
+                return Err(Box::new(ReadErr {
+                    child_err: Box::new(e),
+                }))
+            }
+            Ok(s) => s,
+        };
+        match json::parse(&json) {
+            Err(e) => Err(Box::new(ParseErr::Malformed(Box::new(e)))),
+            Ok(t) => {
+                match TodoList::parse(t) {
+                    Some(t) => {
+                        if t.tasks.len() != 0 {
+                            Ok(t)
+                        } else {
+                            Err(Box::new(ParseErr::Empty))
+                        }
+                    }
+                    None => panic!("This should have never happened; the data was not following the right scheme."),
+                }
+            }
+        }
     }
 }
-
-fn parse_json_to_todo_list(parsed: JsonValue) -> Result<TodoList, Box<dyn Error>> {
-    let title = parsed["title"]
-        .as_str()
-        .ok_or_else(|| Box::new(ParseErr::Empty))?
-        .to_string();
-
-    // Vérifie si la liste des tâches est vide
-    let tasks = parsed["tasks"]
-        .members()
-        .map(|t| Task {
-            id: t["id"].as_u32().unwrap_or_default(),
-            description: t["description"].as_str().unwrap_or_default().to_string(),
-            level: t["level"].as_u32().unwrap_or_default(),
-        })
-        .collect::<Vec<Task>>();
-
-    if tasks.is_empty() {
-        return Err(Box::new(ParseErr::Empty));
-    }
-
-    Ok(TodoList { title, tasks })
-}
-

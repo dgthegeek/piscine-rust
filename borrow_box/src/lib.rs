@@ -8,37 +8,35 @@ pub struct GameSession {
 
 impl GameSession {
     pub fn new(id: u32, p1_name: String, p2_name: String, nb_games: u16) -> Box<GameSession> {
-		let res = GameSession {
-			id: id,
-			p1: (p1_name, 0),
-			p2: (p2_name, 0),
-			nb_games: nb_games
-		};
-		Box::new(res)
+        Box::new(GameSession{
+            id,
+            p1: (p1_name, 0),
+            p2: (p2_name, 0),
+            nb_games
+        })
     }
+
     pub fn read_winner(&self) -> (String, u16) {
-		let p1_score = self.p1.1;
-		let p2_score = self.p2.1;
-		if p1_score > p2_score {
-			self.p1.clone()
-		} else if p1_score < p2_score {
-			self.p2.clone()
-		} else {
-			("Same score! tied".to_string(), p1_score)
-		}
-    }
-    pub fn update_score(&mut self, user_name: String) {
-		if self.p1.1 + self.p2.1 == self.nb_games || 
-        (self.p1.0 != user_name && self.p2.0 != user_name) ||
-        self.p1.1 > self.nb_games / 2 || self.p2.1 > self.nb_games / 2 {
-            return;
-        }else if self.p1.0 == user_name {
-            self.p1.1 += 1;
-        }else if self.p2.0 == user_name {
-            self.p2.1 += 1;
+        if self.p1.1 > self.p2.1 {
+            return self.p1.clone()
+        } else if self.p1.1 < self.p2.1 {
+            return self.p2.clone()
+        } else {
+            return ("Same score! tied".to_string(), self.p1.1)
         }
     }
+
+    pub fn update_score(&mut self, user_name: String) {
+        if self.p1.1 + self.p2.1 < self.nb_games {
+            if self.p1.0 == user_name && self.p1.1 < self.nb_games / 2 + 1 {
+                self.p1.1 += 1;
+            } else if self.p2.0 == user_name && self.p2.1 < self.nb_games / 2 + 1 {
+                self.p2.1 += 1;
+            }
+        }
+    }
+
     pub fn delete(self) -> String {
-		format!("game deleted: id -> {}", self.id)
+        format!("game deleted: id -> {}", self.id)
     }
 }

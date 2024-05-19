@@ -1,26 +1,32 @@
-
-
 pub fn nbr_function(c: i32) -> (i32, f64, f64) {
-    let exp = (c as f64).exp();
-    let abs_log = (c.abs() as f64).ln();
-    (c, exp, abs_log)
+    (c, (c as f64).exp(), (c.abs() as f64).ln())
 }
 
 pub fn str_function(a: String) -> (String, String) {
-    let exp_values: Vec<String> = a
-        .split_whitespace()
-        .map(|x| {
-            let num: f64 = x.parse().unwrap_or(0.0);
-            num.exp().to_string()
-        })
-        .collect();
+    let numbers = a.split_whitespace();
+    let mut result = String::new();
 
-    (a, exp_values.join(" "))
+    for number in numbers {
+        if let Ok(num) = number.parse::<f64>() {
+            let exp = num.exp().to_string();
+            result.push_str(&exp);
+            result.push(' ');
+        }
+    }
+
+    if result.ends_with(' ') {
+        result.pop();
+    }
+
+    (a, result)
 }
 
 pub fn vec_function(b: Vec<i32>) -> (Vec<i32>, Vec<f64>) {
-    let abs_logs: Vec<f64> = b.iter().map(|&x| (x.abs() as f64).ln()).collect();
-    (b, abs_logs)
+    let mut result = Vec::new();
+
+    for number in &b {
+        result.push((number.abs() as f64).ln());
+    }
+
+    (b, result)
 }
-
-

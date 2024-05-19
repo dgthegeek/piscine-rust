@@ -5,69 +5,91 @@ pub use mall::floor::*;
 pub use mall::guard::*;
 pub use mall::*;
 
-pub fn biggest_store(m: mall::Mall) -> store::Store {
+pub fn biggest_store(mall: Mall) -> Store {
+    let mut max = 0;
     let mut max_store = Store::new("", 0, Vec::new());
-    let mut max_size: u64 = 0;
-    for floor in m.floors {
-        for store in &floor.stores {
-            if store.square_meters > max_size {
+    let floors = mall.floors;
+    for floor in floors {
+        let stores = floor.stores;
+        for store in stores.iter() {
+            if store.square_meters > max {
+                max = store.square_meters;
                 max_store = store.clone();
-                max_size = store.square_meters;
             }
         }
     }
-    max_store
+    max_store.clone()
 }
-pub fn highest_paid_employee(m: mall::Mall) -> Vec<floor::store::employee::Employee> {
-    let mut employees: Vec<floor::store::employee::Employee> = Vec::new();
-    let mut max_salary: f64 = 0.0;
-    for floor in m.floors {
-        for store in &floor.stores {
-            for emp in &store.employees {
-                if emp.salary > max_salary {
-                    max_salary = emp.salary;
-                    employees.clear();
-                    employees.push(emp.clone());
-                } else if emp.salary == max_salary {
-                    employees.push(emp.clone());
+
+pub fn highest_paid_employee(mall: Mall) -> Vec<Employee> {
+    let mut max_salaire = 0.0;
+    let mut higgest = Employee::new("", 0, 0, 0, 0.0);
+    let floors = mall.floors;
+    let mut result = Vec::new();
+    for floor in floors {
+        let stores = floor.stores;
+        for store in stores.iter() {
+            let employees = store.employees.clone();
+            for employee in employees.iter() {
+                if employee.salary > max_salaire {
+                    max_salaire = employee.salary;
+                    higgest = employee.clone();
+                    result.clear();
+                    result.push(higgest)
+                }else if  employee.salary == max_salaire{
+                    higgest = employee.clone();
+                    result.push(higgest)
                 }
             }
         }
     }
-    employees
+    result
 }
-pub fn nbr_of_employees(m: mall::Mall) -> usize {
-    let mut nbr_employees = m.guards.len();
-    for floor in m.floors {
-        for store in &floor.stores {
-            nbr_employees += store.employees.len();
+
+pub fn nbr_of_employees(mall: Mall) -> usize {
+    let mut nbr_employee = 0;
+    let floors = mall.floors.clone();
+    let nbr_guards = mall.guards.len();
+    for floor in floors {
+        let stores = floor.stores.clone();
+        for store in stores.iter() {
+            let employees = store.employees.clone();
+            nbr_employee += employees.len().clone();
         }
     }
-    nbr_employees
+    nbr_employee.clone()+nbr_guards
 }
-pub fn check_for_securities(m: &mut mall::Mall, guards: Vec<mall::guard::Guard>) {
-    let mut total_size: usize = 0;
-    for floor in &m.floors {
-        total_size += floor.size_limit as usize;
+
+pub fn check_for_securities(mall: &mut Mall, guards: Vec<Guard>) {
+    let mut size = 0;
+    for floor in mall.floors.iter() {
+        size += floor.size_limit;
     }
-    let nbr_employee_needs = (total_size / 200) - m.guards.len();
-    if nbr_employee_needs > 0 {
-        for j in 0..nbr_employee_needs {
-            mall::Mall::hire_guard(m, guards[j].clone());
+    let normal = size / 200;
+    let i = normal as usize - mall.guards.len();
+    if i > 0 {
+        for j in 0..i {
+            mall::Mall::hire_guard(mall, guards[j].clone());
         }
     }
 }
-pub fn cut_or_raise(m: &mut mall::Mall) {
-    for floor in m.floors.iter_mut() {
-        for store in floor.stores.iter_mut() {
-            for employee in store.employees.iter_mut() {
-                let working_hours = employee.working_hours.1 - employee.working_hours.0;
-                if working_hours > 10 {
-                    employee.raise(employee.salary * 0.1)
+
+pub fn cut_or_raise(mall: &mut Mall) {
+    let mut floors = mall.floors.clone();
+    for floor in floors.iter_mut() {
+        let mut stores = floor.stores.clone();
+        for store in stores.iter_mut() {
+            let mut employees = store.employees.clone();
+            for employee in employees.iter_mut() {
+                if employee.working_hours.1 - employee.working_hours.0 > 10 {
+                    employee::Employee::raise(employee,employee.salary * 0.1);
                 } else {
-                    employee.cut(employee.salary * 0.1)
-                };
+                    employee::Employee::cut(employee,employee.salary * 0.1); 
+                }
             }
+            store.employees= employees;
         }
+        floor.stores=stores;
     }
+    mall.floors=floors;
 }

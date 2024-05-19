@@ -1,13 +1,15 @@
 pub fn fibonacci(n: u32) -> u32 {
-    if n == 0 {
-        return 0;
-    } else if n == 1 {
-        return 1;
+    if n <= 1 {
+        return n;
     }
 
-    let mut fib = (0, 1);
+    let mut a = 0;
+    let mut b = 1;
+
     for _ in 2..=n {
-        fib = (fib.1, fib.0 + fib.1);
+        let c = a + b;
+        a = b;
+        b = c;
     }
-    fib.1
+    b
 }

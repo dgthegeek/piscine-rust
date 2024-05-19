@@ -1,6 +1,8 @@
 use std::ops::{Add, Sub};
+
 #[derive(Debug, PartialEq)]
 pub struct Matrix<T>(pub Vec<Vec<T>>);
+
 impl<T> Add for Matrix<T>
 where
     T: Copy + Add<Output = T>,
@@ -21,6 +23,7 @@ where
         Some(Matrix(result))
     }
 }
+
 impl<T> Sub for Matrix<T>
 where
     T: Copy + Sub<Output = T>,

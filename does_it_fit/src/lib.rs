@@ -1,4 +1,4 @@
-mod areas_volumes;
+mod  areas_volumes;
 pub use areas_volumes::*;
 pub fn area_fit(
     x: usize,
@@ -8,14 +8,25 @@ pub fn area_fit(
     a: usize,
     b: usize,
 ) -> bool {
-    let aire_rect = (x * y) as f64;
-    let air_object = match objects {
-        areas_volumes::GeometricalShapes::Square => areas_volumes::square_area(a) as f64,
-        areas_volumes::GeometricalShapes::Circle => areas_volumes::circle_area(a),
-        areas_volumes::GeometricalShapes::Rectangle => areas_volumes::rectangle_area(a, b) as f64,
-        areas_volumes::GeometricalShapes::Triangle => areas_volumes::triangle_area(a, b),
-    };
-    air_object * times as f64 <= aire_rect
+    let rec_area = x * y;
+    match objects {
+        GeometricalShapes::Square => {
+            let shape_area = square_area(a);
+            return shape_area * times <= rec_area;
+        }
+        GeometricalShapes::Circle => {
+            let shape_area =circle_area(a);
+            return shape_area * times as f64 <= rec_area as f64;
+        }
+        GeometricalShapes::Triangle => {
+            let shape_area = triangle_area(a, b);
+            return shape_area * times as f64 <= rec_area as f64;
+        }
+        GeometricalShapes::Rectangle => {
+            let shape_area = rectangle_area(a, b);
+            return shape_area * times  <= rec_area;
+        }
+    }
 }
 pub fn volume_fit(
     x: usize,
@@ -27,17 +38,27 @@ pub fn volume_fit(
     b: usize,
     c: usize,
 ) -> bool {
-    let volume_box = x * y * z;
-    let volume_object = match objects {
-        areas_volumes::GeometricalVolumes::Cube => areas_volumes::cube_volume(a),
-        areas_volumes::GeometricalVolumes::Sphere => areas_volumes::sphere_volume(a) as usize,
-        areas_volumes::GeometricalVolumes::Cone => areas_volumes::cone_volume(a, b) as usize,
-        areas_volumes::GeometricalVolumes::Pyramid => {
-            areas_volumes::triangular_pyramid_volume(a as f64, b) as usize
+    let box_vol = areas_volumes::parallelepiped_volume(x,y,z);
+    match objects {
+        GeometricalVolumes::Sphere=>{
+            let shape_vol = areas_volumes::sphere_volume(a);
+            return  shape_vol*times as f64 <= box_vol as f64
+        },
+        GeometricalVolumes::Cube=>{
+            let shape_vol = areas_volumes::cube_volume(a);
+            return  shape_vol*times <= box_vol
         }
-        areas_volumes::GeometricalVolumes::Parallelepiped => {
-            areas_volumes::parallelepiped_volume(a, b, c)
+        GeometricalVolumes::Cone=>{
+            let shape_vol = areas_volumes::cone_volume(a,b);
+            return  shape_vol*times as f64 <= box_vol as f64
         }
-    };
-    volume_box >= volume_object * times
+        GeometricalVolumes::Parallelepiped=>{
+            let shape_vol = areas_volumes::parallelepiped_volume(a,b,c);
+            return  shape_vol*times <= box_vol
+        }
+        GeometricalVolumes::Pyramid=>{
+            let shape_vol = areas_volumes::triangular_pyramid_volume(a as f64,b);
+            return  shape_vol*times as f64 <= box_vol as f64
+        }
+    }
 }

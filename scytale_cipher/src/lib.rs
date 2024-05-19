@@ -1,24 +1,22 @@
-pub fn scytale_cipher(message: String, wraps: u32) -> String {
-    if wraps >= message.len() as u32 || wraps == 0 {
-        return message;
+pub fn scytale_cipher(message: String, size: u32) -> String {
+    let mut result = String::new();
+    let mut matrix: Vec<Vec<Option<char>>> = vec![vec![None; size as usize]; (message.len() as f32 / size as f32).ceil() as usize];
+    
+    for (i, c) in message.chars().enumerate() {
+        let row = i / size as usize;
+        let col = i % size as usize;
+        matrix[row][col] = Some(c);
     }
 
-    let wraps = wraps as usize;
-    let message_len = message.len();
-    let mut result = String::with_capacity(message_len);
-
-    let rows = (message_len + wraps - 1) / wraps;
-
-    for col in 0..wraps {
-        for row in 0..rows {
-            let index = row * wraps + col;
-            if index < message_len {
-                result.push(message.chars().nth(index).unwrap());
-            } else {
-                result.push(' ');
+    for col in 0..size as usize {
+        for row in 0..matrix.len() {
+            if let Some(c) = matrix[row][col] {
+                result.push(c);
+            }else {
+                result.push(' ')
             }
         }
     }
-
-    result.trim_end().to_string()
+    
+    result.trim().to_string()
 }

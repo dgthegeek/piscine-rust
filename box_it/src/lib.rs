@@ -1,21 +1,17 @@
 pub fn transform_and_save_on_heap(s: String) -> Box<Vec<u32>> {
-    let mut numbers: Vec<u32> = Vec::new();
+    let mut numbers_without_suffix = Vec::new();
 
-    for token in s.split_whitespace() {
-        if token.ends_with('k') {
-            
-            let mut value = token[0..token.len()-1].parse::<f64>().unwrap();
-            value *= 1000.0;
-            
-            numbers.push(value as u32);
-        }else{
-            let value = token.parse::<u32>().unwrap_or(0);
-            numbers.push(value);
+    for number in s.split_whitespace() {
+        if number.ends_with("k") {
+            let mut str_number = String::from(number);
+            str_number.pop();
+            numbers_without_suffix.push((str_number.parse::<f64>().unwrap() * 1000.0) as u32);
+        } else {
+            numbers_without_suffix.push(number.to_string().parse::<u32>().unwrap());
         }
-
-
     }
-    Box::new(numbers)
+
+    Box::new(numbers_without_suffix)
 }
 
 pub fn take_value_ownership(a: Box<Vec<u32>>) -> Vec<u32> {

@@ -1,9 +1,10 @@
-use std::fs::{self, File};
-use std::io;
+use std::fs::File;
 
 pub fn open_file(s: &str) -> File {
-    match File::open(s) {
+    let file_result = File::open(s);
+    let file = match file_result {
         Ok(file) => file,
         Err(_) => panic!("File not found"),
-    }
+    };
+    file
 }

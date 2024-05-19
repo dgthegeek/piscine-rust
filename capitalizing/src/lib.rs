@@ -1,42 +1,39 @@
 pub fn capitalize_first(input: &str) -> String {
-    let mut result = String::new();
-    if let Some(first_char) = input.chars().nth(0){
-        result.push(first_char.to_ascii_uppercase())
-    }else{
-        return input.to_string()
+    let mut output = String::new();
+    for (index, value) in input.chars().enumerate() {
+        if index == 0 {
+            output.push(value.to_uppercase().next().unwrap());
+            continue;
+        }
+        output.push(value);
     }
-    result+= &input[1..];
-    result
+
+    output
 }
 
 pub fn title_case(input: &str) -> String {
-    let mut result = String::new();
-
-    for word in input.split_whitespace(){
-        result+= &capitalize_first(word);
-        if let Some(last_word) = input.split_whitespace().last(){
-            if word != last_word{
-                result.push(' ');
-            }
-        }
+    let words: Vec<&str> = input.split(" ").collect();
+    let mut output = String::new();
+    for word in words {
+        let word = capitalize_first(word);
+        output.push_str(&word);
+        output.push(' ');
     }
-    result
-    
+
+    output.trim_end().to_string()
 }
 
 pub fn change_case(input: &str) -> String {
-    let mut result = String::new();
-    for c in input.chars(){
-        if c.is_ascii_lowercase(){
-           let up=  c.to_uppercase().to_string();  
-            result+= &up;
-        } else if c.is_ascii_uppercase() {
-            let low=  c.to_lowercase().to_string();  
-            result+= &low;
-        }else{
-            result.push(' ');
+    let mut output = String::new();
+    for char in input.chars() {
+        if char.is_uppercase() {
+            output.push(char.to_lowercase().next().unwrap());
+        } else if char.is_lowercase() {
+            output.push(char.to_uppercase().next().unwrap());
+        } else {
+            output.push(char);
         }
-    };
-    result
-}
+    }
 
+    output
+}
